@@ -1,11 +1,26 @@
 import { Chessboard } from 'react-chessboard';
-import { Chess } from 'chess.js';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
-const Board = () => {
-  const [game, setGame] = useState(new Chess());
-  const [optionSquares, setOptionSquares] = useState({});
+const Board = (props) => {
+  const chessboardRef = useRef();
   const [orientation, setOrientation] = useState('white');
+
+
+  const onDrop = (source, target) => {
+    const move = props.game.move({
+      from: source,
+      to: target
+    });
+
+    if (move === null) {
+      return false;
+    }
+
+    props.setGame(props.game);
+    props.setCurrFen(props.game.fen())
+
+    return move;
+  }
 
   const changeOrientation = () => {
     if (orientation === 'white') {
@@ -15,48 +30,18 @@ const Board = () => {
     }
   }
 
-  const onSquareClick = (square) => {
-    moveOptions(square);
-    console.log(square);
-  }
-
-  const moveOptions = (square) => {
-    let moves = game.moves({
-      square,
-      verbose: true
-    });
-
-    if (moves.length === 0) {
-      return;
-    }
-
-    let possibleMoves = {};
-    moves.map((move) => {
-      possibleMoves[move.to] = {
-        background:
-          game.get(move.to) && game.get(move.to).color !== game.get(square).color
-            ? 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)'
-            : 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
-        borderRadius: '50%'
-      }
-      return move;
-    })
-    possibleMoves[square] = {
-      background: 'rgba(255, 255, 0, 0.4)'
-    };
-  }
-
   const showBoard = () => {
-    console.log(game);
+    console.log(props.game);
   }
 
   return (
     <>
       <Chessboard
         id='basic-board'
-        position={game.fen()}
-        onSquareClick={onSquareClick}
-        boardOrientation={orientation}/>
+        position={props.currFen}
+        onPieceDrop={onDrop}
+        boardOrientation={orientation}
+        ref={chessboardRef} />
       <button onClick={changeOrientation}>Flip Board</button>
       <button onClick={showBoard}>Show Board</button>
     </>
