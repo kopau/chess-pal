@@ -7,6 +7,7 @@ const Details = (props) => {
     <div className='details-column'>
       <h2 className='opening-header'>Current Opening</h2>
       <div className='current-opening'>{props.opening}</div>
+      <b>Going to Add Analysis Bar</b>
       <div className='moves-list'>
         <h2>Most Common Moves</h2>
         {props.moves.length > 0
